@@ -26,4 +26,5 @@ export const AnimalModel = mongoose.model('Mammal', AnimalSchema)
 export const getAnimals = (sample_size: number) => AnimalModel.aggregate([{ $sample: { size: sample_size } }]);
 export const getAnimalById = (id: string) => AnimalModel.findById(id)
 export const getAnimalByFilter = (query: Record<string, any>) => AnimalModel.find(query)
-export const updateAnimalById = (id: string, values: Record<string, any>) => AnimalModel.findByIdAndUpdate(id, values)
+export const createAnimal = (values: Record<string, any>) => new AnimalModel(values).save().then((user) => user.toObject())
+export const updateAnimalById = (id: string, values: Record<string, any>) => AnimalModel.findByIdAndUpdate(id, values).then((animal) => animal.toObject())

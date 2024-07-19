@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema({
     email: {type: String, required: true},
     api_key: {type: String, required: true},
+    admin: {type: Boolean, default: false},
     authentication: {
         password: {type: String, required: true, select: false},
         api_secret: {type: String, required: true, select: false},

@@ -67,3 +67,19 @@ export const isOwner = (req: express.Request, res: express.Response, next: expre
         return res.sendStatus(400)
     }
 }
+
+export const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+        const isAdmin = get(req, 'identity.admin') as boolean
+
+        if (!isAdmin) {
+            return res.sendStatus(403)
+        }
+
+        next()
+
+    } catch (error) {
+        console.log(error)
+        return res.sendStatus(400)
+    }
+}

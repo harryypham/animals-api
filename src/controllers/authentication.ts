@@ -26,6 +26,7 @@ export const register = async (req: express.Request, res: express.Response) => {
         const user = await createUser({
             email,
             api_key,
+            admin: false,
             authentication: {
                 salt,
                 password: authentication(salt, password),
@@ -88,7 +89,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 }
 
 
-export const loginWithEmailPassword = async (req: express.Request, res: express.Response) => {
+export const regenerateApiSecret = async (req: express.Request, res: express.Response) => {
     try {
         const { email, password } = req.body;
 
@@ -122,7 +123,7 @@ export const loginWithEmailPassword = async (req: express.Request, res: express.
             domain: 'localhost',
             path: '/'
         })
-        
+
         const responseUser = {
             ...user.toObject(),
             api_secret
