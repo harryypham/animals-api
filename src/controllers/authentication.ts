@@ -1,24 +1,28 @@
 import express from 'express'
-import { createUser, getUserByApiKey, getUserByEmail } from '../db/users';
-import { authentication, generateApiKey, generateApiSecret, random } from '../helpers'
+import { createUser, getUserByApiKey, getUserByEmail, updateUserById } from '../db/users';
+import { authentication, generateApiKey, random } from '../helpers'
 
 export const register = async (req: express.Request, res: express.Response) => {
     try {
         const {email, password, } = req.body;
 
         if (!email || !password) {
-            return res.sendStatus(400)
+            return res.status(401).send({
+                message: 'Missing email or password'
+            })
         }
 
         const existingUser = await getUserByEmail(email)
 
         if (existingUser) {
-            return res.sendStatus(400)
+            return res.status(403).send({
+                message: 'User already exists'
+            })
         }
 
         const salt = random()
         const api_key = generateApiKey()
-        const api_secret = generateApiSecret()
+        const api_secret = generateApiKey()
         const user = await createUser({
             email,
             api_key,
@@ -46,13 +50,17 @@ export const login = async (req: express.Request, res: express.Response) => {
         const { api_key, api_secret } = req.body;
 
         if (!api_key || !api_secret) {
-            return res.sendStatus(400)
+            return res.status(401).send({
+                message: 'Missing API_KEY or API_SECRET'
+            })
         }
 
         const user = await getUserByApiKey(api_key).select('+authentication.salt +authentication.api_secret')
 
         if (!user) {
-            return res.sendStatus(400);
+            return res.status(401).send({
+                message: 'User not found'
+            });
         }
 
         const expectedHash = authentication(user.authentication.salt, api_secret)
@@ -61,6 +69,7 @@ export const login = async (req: express.Request, res: express.Response) => {
         }
 
         const salt = random()
+        
         user.authentication.sessionToken = authentication(salt, user._id.toString())
 
         await user.save()
@@ -99,6 +108,12 @@ export const loginWithEmailPassword = async (req: express.Request, res: express.
         }
 
         const salt = random()
+        const api_key = generateApiKey()
+        const api_secret = generateApiKey()
+        const hashed_api_secret = authentication(user.authentication.salt, api_secret)
+
+        user.api_key = api_key
+        user.authentication.api_secret = hashed_api_secret
         user.authentication.sessionToken = authentication(salt, user._id.toString())
 
         await user.save()
@@ -107,8 +122,15 @@ export const loginWithEmailPassword = async (req: express.Request, res: express.
             domain: 'localhost',
             path: '/'
         })
+        
+        const responseUser = {
+            ...user.toObject(),
+            api_secret
+        }
+        console.log(responseUser)
+        delete responseUser.authentication
 
-        return res.status(200).json(user).end()
+        return res.status(200).json(responseUser).end()
 
     } catch (error) {
         console.log(error)

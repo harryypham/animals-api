@@ -1,8 +1,10 @@
 import express from 'express'
 
-import { getAllAnimals } from '../controllers/animals'
+import { getAnimalsList, fetchAnimalById, fetchAnimalByFilter } from '../controllers/animals'
 import { isAuthenticated } from '../middlewares'
 
 export default (router: express.Router) => {
-    router.get('/animals', isAuthenticated, getAllAnimals)
+    router.get('/animals-list', isAuthenticated, getAnimalsList)
+    router.get('/animals/:id', isAuthenticated, fetchAnimalById)
+    router.get('/animals', isAuthenticated, fetchAnimalByFilter)
 }
