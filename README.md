@@ -9,7 +9,7 @@ The Animals API allows users to retrieve and create information about various an
 - Swagger Documentation
 
 ## Getting Started
-To get started with the Animals API, follow these steps:
+To get started with the Animals API, you first need to crawl the web for animal data and set up your own database. An example script to perform this data collection will be provided here. Once you have gathered the data, follow these steps:
 
 Clone the repository:
 ```bash
