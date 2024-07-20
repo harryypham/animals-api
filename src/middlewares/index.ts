@@ -1,7 +1,7 @@
 import express from 'express'
 import { get, merge } from 'lodash'
 
-import { getUserBySessionToken, getUserByEmail, getUserByApiKey } from '../db/users'
+import { getUserBySessionToken, getUserByApiKey } from '../db/users'
 import { authentication } from '../helpers'
 
 export const isAuthenticated = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -17,15 +17,15 @@ export const isAuthenticated = async (req: express.Request, res: express.Respons
                 return res.sendStatus(400);
             }
 
-            const user = await getUserByApiKey(api_secret).select('+authentication.salt +authentication.api_secret');
+            const user = await getUserByApiKey(api_key).select('+authentication.salt +authentication.api_secret');
 
             if (!user) {
-                return res.sendStatus(400);
+                return res.sendStatus(401);
             }
 
             const expectedHash = authentication(user.authentication.salt, api_secret);
             if (user.authentication.api_secret !== expectedHash) {
-                return res.sendStatus(403);
+                return res.sendStatus(401);
             }
             delete user.authentication.salt;
             delete user.authentication.api_secret;
@@ -35,7 +35,7 @@ export const isAuthenticated = async (req: express.Request, res: express.Respons
         }
 
         if (!existingUser) {
-            return res.sendStatus(403)
+            return res.sendStatus(401)
         }
 
         merge(req, {identity: existingUser})

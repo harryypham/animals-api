@@ -1,11 +1,5 @@
 import express from "express"
-import {
-  getAnimals,
-  getAnimalById,
-  getAnimalByFilter,
-  updateAnimalById,
-  createAnimal,
-} from "../db/animals"
+import { getAnimals, getAnimalById, getAnimalByFilter, updateAnimalById, createAnimal } from "../db/animals"
 
 export const getAnimalsList = async (
   req: express.Request,
@@ -52,22 +46,19 @@ export const fetchAnimalByFilter = async (
   }
 }
 
-export const insertAnimal = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const { common_name, img_url, description } = req.body
-    if (!common_name || !img_url || !description) {
-      return res.status(400).send({ message: "Animal is not valid" })
+export const insertAnimal = async (req: express.Request, res: express.Response) => {
+    try {
+        const {common_name, img_url, description} = req.body
+        if (!common_name || !img_url || !description) {
+            return res.status(400).send({message: 'Animal is not valid'})
+        }
+        const animal = await createAnimal(req.body)
+    
+        return res.status(200).json(animal)
+    } catch (error) {
+        console.log(error)
+        return res.sendStatus(400)
     }
-    const animal = await createAnimal(req.body)
-
-    return res.status(200).json(animal)
-  } catch (error) {
-    console.log(error)
-    return res.sendStatus(400)
-  }
 }
 
 export const updateAnimal = async (
