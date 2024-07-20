@@ -21,6 +21,8 @@ Install dependencies:
 npm install
 ```
 
+Edit the .local.env file in the root directory to include all your environment variables
+
 Start the server:
 ```bash
 npm start
